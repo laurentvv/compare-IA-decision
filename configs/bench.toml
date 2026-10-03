@@ -1,0 +1,50 @@
+# decision-bench configuration.
+# Machine paths (AGENTS.md §1) live here, not in code. Override per run with
+# --models / --output / --base-url. Port note: llama-server will move its default
+# to 9931 in a future release; range 8871-8970 is reserved (Hyper-V) — avoid it.
+
+[server]
+binary = "C:/llama.cpp/llama-server.exe"
+host = "127.0.0.1"
+port = 8080
+startup_timeout_s = 180
+
+[bench]
+output_dir = "results"
+request_timeout_s = 60
+error_budget = 0.05
+
+# Matched-weights comparison rule (user decision): Q8_0 for every model.
+
+[[models]]
+name = "julia-1"
+gguf_path = "D:/Modeles_LLM/Decision/Julia-1/Julia-1-Q8_0.gguf"
+enabled = true
+
+[[models]]
+name = "laya"
+gguf_path = "D:/Modeles_LLM/Decision/Laya/Laya-Q8_0.gguf"
+enabled = true
+
+[[models]]
+name = "lev"
+gguf_path = "D:/Modeles_LLM/Decision/lev/lev-Q8_0.gguf"
+enabled = true
+
+[[models]]
+name = "kev-0.8b"
+gguf_path = "D:/Modeles_LLM/Decision/Kev-0.8B/Kev-0.8B-Q8_0.gguf"
+enabled = true
+
+[[models]]
+name = "kev-4b"
+gguf_path = "D:/Modeles_LLM/Decision/Kev-4B/Kev-4B-Q8_0.gguf"
+enabled = true
+
+# 35B-A3B MoE (28.6 GB Q8_0), CC-BY-NC-4.0 (non-commercial), vision-capable.
+# Exceeds the <8B target: keep disabled unless explicitly needed; would need
+# CPU expert offload on a 16 GB GPU. Add "extra_args" (e.g. ["-ngl", "99"]) when enabling.
+[[models]]
+name = "openjev"
+gguf_path = "D:/Modeles_LLM/Decision/OpenJev/OpenJev-Q8_0.gguf"
+enabled = false

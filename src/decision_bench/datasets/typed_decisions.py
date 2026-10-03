@@ -26,7 +26,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[3]
 def _download_snapshot() -> Path:
     from huggingface_hub import snapshot_download
 
-    return Path(snapshot_download(DATASET_ID, repo_type="dataset"))
+    return Path(snapshot_download(_DATASET_ID, repo_type="dataset"))
 
 
 def _dataset_root() -> Path:
@@ -40,7 +40,7 @@ def _dataset_root() -> Path:
 def _select_parquets(root: Path, config_name: str, split: str) -> list[Path]:
     parquets = sorted(root.rglob("*.parquet"))
     if not parquets:
-        raise FileNotFoundError(f"no parquet files found in {DATASET_ID} snapshot at {root}")
+        raise FileNotFoundError(f"no parquet files found in {_DATASET_ID} snapshot at {root}")
     in_config = [p for p in parquets if config_name in p.parts]
     with_split = [p for p in in_config if split in p.stem]
     if with_split:
