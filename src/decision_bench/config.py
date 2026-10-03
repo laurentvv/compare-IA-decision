@@ -24,6 +24,7 @@ class ServerConfig:
     host: str = "127.0.0.1"
     port: int = 8080
     startup_timeout_s: float = 120.0
+    settle_s: float = 2.0  # post-load settle before measuring (excluded from latency)
 
 
 @dataclass
@@ -56,6 +57,7 @@ def load_config(path: Path) -> BenchConfig:
             host=str(srv.get("host", "127.0.0.1")),
             port=int(srv.get("port", 8080)),
             startup_timeout_s=float(srv.get("startup_timeout_s", 120.0)),
+            settle_s=float(srv.get("settle_s", 2.0)),
         ),
         models=models,
         output_dir=Path(bench.get("output_dir", "results")),

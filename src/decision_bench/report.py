@@ -17,13 +17,17 @@ _COLUMNS = [
     ("coverage_at_5%_error", "cov@5%"),
     ("latency_p50_s", "p50 s"),
     ("latency_p95_s", "p95 s"),
+    ("input_tokens_mean_per_case", "tok/case"),
+    ("gguf_gb", "GB"),
     ("failures", "fails"),
 ]
 
 
 def _fmt(value: object) -> str:
     if isinstance(value, float):
-        return "—" if math.isnan(value) else f"{value:.3f}"
+        if math.isnan(value):
+            return "—"
+        return f"{value:.1f}" if abs(value) >= 100 else f"{value:.3f}"
     if value is None:
         return "—"
     return str(value)
@@ -34,12 +38,22 @@ def _type_accuracy(run: ModelRun, qtype: str) -> str:
     return "—" if not block else _fmt(block["accuracy"])
 
 
-def render_summary_md(runs: list[ModelRun], suite: str, n_cases: int, error_budget: float) -> str:
+def render_summary_md(
+    runs: list[ModelRun],
+    suite: str,
+    n_cases: int,
+    error_budget: float,
+    meta: dict | None = None,
+) -> str:
     lines = [
         "# Decision models comparison",
         "",
         f"- Suite: `{suite}` ({n_cases} cases)",
         "- Quantization: Q8_0 for every model (matched-weights comparison rule).",
+    ]
+    if meta:
+        lines.extend(f"- {key}: {value}" for key, value in meta.items())
+    lines += [
         "- Grading: choice=argmax vs gold; score=round(expected) vs gold level (+MAE in JSON); noul=p(true)>=0.5.",
         "- Probabilities are NOT guaranteed calibrated (llama.cpp scales them with per-model temperatures);",
         "  read Brier/NLL/ECE/KL alongside accuracy, per the typed-decisions dataset card.",
@@ -64,15 +78,23 @@ def render_summary_md(runs: list[ModelRun], suite: str, n_cases: int, error_budg
         "- Failed requests are counted in `fails` and stay in the denominator (no silent retry).",
         f"- `cov@{error_budget:.0%}` = share of questions automatable at empirical error"
         f" <= {error_budget:.0%} (highest confidence first).",
-        "- Latency is per-case (one HTTP request with all questions of the case), warmup excluded.",
+        "- Latency is per-case (one HTTP request with all questions of the case); model load,"
+        " settle delay and warmup are excluded (load time is reported as `server_load_s` in the JSON).",
         "",
     ]
     return "\n".join(lines)
 
 
-def write_summary_md(runs: list[ModelRun], suite: str, n_cases: int, error_budget: float, run_dir: Path) -> Path:
+def write_summary_md(
+    runs: list[ModelRun],
+    suite: str,
+    n_cases: int,
+    error_budget: float,
+    run_dir: Path,
+    meta: dict | None = None,
+) -> Path:
     out = run_dir / "summary.md"
-    out.write_text(render_summary_md(runs, suite, n_cases, error_budget), encoding="utf-8")
+    out.write_text(render_summary_md(runs, suite, n_cases, error_budget, meta), encoding="utf-8")
     return out
 
 

@@ -115,6 +115,7 @@ def _run_cases(client: SystemOneClient, cases: list[Case]) -> tuple[list[Questio
                 "error": result.error,
                 "latency_s": result.latency_s,
                 "input_tokens": result.input_tokens,
+                "resp_model": result.resp_model,
             }
         )
     return records, latencies, case_log
@@ -143,7 +144,10 @@ def run_model(
     manager = None
     try:
         if ctx is not None:
-            url = ctx.__enter__()
+            entered = ctx.__enter__()
+            # LlamaServerManager.__enter__ returns self (its .base_url holds the URL);
+            # the mock backend returns the URL string directly.
+            url = entered if isinstance(entered, str) else ctx.base_url
         elif base_url:
             url = base_url
         manager = ctx
@@ -160,6 +164,13 @@ def run_model(
 
     summary = summarize(records, latencies, cfg.error_budget)
     summary["backend"] = backend
+    load_s = getattr(manager, "load_time_s", None)
+    summary["server_load_s"] = round(load_s, 3) if isinstance(load_s, float) else None
+    gguf = Path(model.gguf_path)
+    summary["gguf_gb"] = round(gguf.stat().st_size / 1e9, 3) if gguf.exists() else None
+    tokens = [c["input_tokens"] for c in case_log if c["input_tokens"]]
+    summary["input_tokens_total"] = sum(tokens)
+    summary["input_tokens_mean_per_case"] = round(sum(tokens) / len(tokens), 1) if tokens else None
     payload = _clean(
         {
             "model": model.name,

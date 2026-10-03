@@ -8,6 +8,7 @@ binary = "C:/llama.cpp/llama-server.exe"
 host = "127.0.0.1"
 port = 8080
 startup_timeout_s = 180
+settle_s = 2.0
 
 [bench]
 output_dir = "results"
@@ -20,26 +21,33 @@ error_budget = 0.05
 name = "julia-1"
 gguf_path = "D:/Modeles_LLM/Decision/Julia-1/Julia-1-Q8_0.gguf"
 enabled = true
+# encoder model: the whole prompt must fit one ubatch (llama.cpp README, decision models)
+extra_args = ["--ubatch-size", "8192"]
 
 [[models]]
 name = "laya"
 gguf_path = "D:/Modeles_LLM/Decision/Laya/Laya-Q8_0.gguf"
 enabled = true
+# encoder model: same ubatch constraint (explicitly documented for laya)
+extra_args = ["--ubatch-size", "8192"]
 
 [[models]]
 name = "lev"
 gguf_path = "D:/Modeles_LLM/Decision/lev/lev-Q8_0.gguf"
 enabled = true
+extra_args = ["-ngl", "99", "--ubatch-size", "8192"]
 
 [[models]]
 name = "kev-0.8b"
 gguf_path = "D:/Modeles_LLM/Decision/Kev-0.8B/Kev-0.8B-Q8_0.gguf"
 enabled = true
+extra_args = ["-ngl", "99", "--ubatch-size", "8192"]
 
 [[models]]
 name = "kev-4b"
 gguf_path = "D:/Modeles_LLM/Decision/Kev-4B/Kev-4B-Q8_0.gguf"
 enabled = true
+extra_args = ["-ngl", "99", "--ubatch-size", "8192"]
 
 # 35B-A3B MoE (28.6 GB Q8_0), CC-BY-NC-4.0 (non-commercial), vision-capable.
 # Exceeds the <8B target: keep disabled unless explicitly needed; would need

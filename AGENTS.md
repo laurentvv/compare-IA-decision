@@ -104,16 +104,24 @@ To be defined — repository initialized on 2026-10-03 from the agents-kit base 
 ### Key commands
 
 ```bash
-# §3 gate — to be pinned when the toolchain is chosen: lint ... ; tests ...
+# §3 gate — pinned: uv run ruff check src tests ; uv run pytest
+uv run decision-bench validate-config
+uv run decision-bench run --suite fixture            # real models, llama-server per model
+uv run decision-bench run --suite typed-decisions    # LocalLLaMA/typed-decisions test (400 cases)
 ```
 
 ### Business invariants (never break)
 
-- (none yet — to be written with the first contract)
+- All models in a comparison run at the SAME quantization (user rule, 2026-10-03: Q8_0).
+- Latency never includes model load; server identity is proven via `GET /props`
+  `model_path` before benchmarking.
 
 ### Pitfalls & lessons (dated format)
 
-- *(none yet)*
+- [2026-10-03] Never let two agent sessions write the same working tree: a parallel session clobbered in-flight edits and produced TOML duplicate keys (`Cannot overwrite a value`). The gate catches it; reconcile via git and re-run the gate after any foreign write.
+- [2026-10-03] llama.cpp decision models on BERT-like encoders (laya, julia-1/mmBERT) crash on long prompts with `encoder requires n_ubatch >= n_tokens` — pass `--ubatch-size 8192` (pinned server README). `/health` 200 does NOT identify the server (a stale server on the port answers too), and the child's stdout redirect is CRT-buffered (log lines stay invisible until exit) — identify the loaded model via `GET /props` `model_path`.
+- [2026-10-03] `curl -C -` across a HuggingFace `resolve/` redirect corrupts resumed downloads (got a 4.78 GB "Kev-4B-Q8_0" instead of 4.48 GB): always verify size/sha256 against the repo tree, prefer `hf download`.
+- [2026-10-03] julia-1's decision type logs as `laya` (same BERT readout family): the server log line `decision model type:` is a readout family, not the model identity — use `/props`.
 
 ### References
 

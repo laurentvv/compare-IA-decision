@@ -7,3 +7,5 @@
 ## [2026-10-03] fix  | Kev-4B corrupted by curl -C - resume across HF redirect (5.3 GB vs 4.48 GB expected): fresh download + sha256 7c2ebed9 OK. Corrupt OpenJev partial removed (disabled model).
 ## [2026-10-03] eval | Real E2E exposed encoder ubatch limit: julia-1 GGML_ASSERT at case 19 (30/125 questions lost) -> --ubatch-size 8192 for julia-1/laya (pinned README rule), -ngl 99 for 4B models (CPU 4.5 min/suite too slow).
 ## [2026-10-03] done | F-02/F-03/F-04 complete: 26 tests green, mock E2E ok, real E2E both suites 0 failures (fixture 51 s, typed-25 94 s). Evidence in progress.md; features archived.
+## [2026-10-03] eval | Clean full rerun after session merge (identity /props + settle 2 s): fixture 20 cases + typed-400 x 5 models, 0 fails. julia-1 0.725 acc @53 ms but cov@5%=0.001; kev-4b 0.630 best calibrated.
+## [2026-10-03] done | Full-400 numbers in docs/System-One-Decision-Models-Bench-Report-2026-10-03.md; raw summaries in docs/runs/; results/20261003_112846 & _112938.

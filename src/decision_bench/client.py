@@ -69,6 +69,7 @@ class CaseResult:
     latency_s: float
     input_tokens: int | None
     answers: dict[str, Any]
+    resp_model: str | None = None  # server-reported model field (identity evidence)
 
 
 def validate_response(request: dict[str, Any], data: dict[str, Any]) -> None:
@@ -132,7 +133,15 @@ class SystemOneClient:
         try:
             data, latency, tokens = self.systemone(request)
         except (SystemOneError, httpx.HTTPError) as exc:
-            return CaseResult(case_id, ok=False, error=str(exc), latency_s=0.0, input_tokens=None, answers={})
+            return CaseResult(
+                case_id, ok=False, error=str(exc), latency_s=0.0, input_tokens=None, answers={}, resp_model=None
+            )
         return CaseResult(
-            case_id, ok=True, error=None, latency_s=latency, input_tokens=tokens, answers=data.get("answers", {})
+            case_id,
+            ok=True,
+            error=None,
+            latency_s=latency,
+            input_tokens=tokens,
+            answers=data.get("answers", {}),
+            resp_model=data.get("model"),
         )

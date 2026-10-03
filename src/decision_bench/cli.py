@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import platform
+import subprocess
 import sys
 import time
+from datetime import UTC, datetime
 from pathlib import Path
 
 from decision_bench import __version__
@@ -18,6 +21,19 @@ def _add_common(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--config", type=Path, default=Path("configs/bench.toml"), help="TOML config path")
     parser.add_argument("--models", default=None, help="comma-separated model names (default: all enabled)")
     parser.add_argument("--output", type=Path, default=None, help="override output directory")
+
+
+def _server_version(binary: str) -> str:
+    if not binary:
+        return "<unset>"
+    try:
+        proc = subprocess.run(
+            [binary, "--version"], capture_output=True, text=True, timeout=15, check=False
+        )
+        first = ((proc.stdout or "") + (proc.stderr or "")).strip().splitlines()
+        return first[0] if first else "unknown"
+    except (OSError, subprocess.TimeoutExpired):
+        return "unknown"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -63,6 +79,15 @@ def main(argv: list[str] | None = None) -> int:
     run_dir = output_dir / time.strftime("%Y%m%d_%H%M%S")
     run_dir.mkdir(parents=True, exist_ok=True)
 
+    spawn = f"llama-server spawned per model ({cfg.server.host}:{cfg.server.port})"
+    meta = {
+        "Generated": datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"),
+        "Server": "bundled deterministic mock" if args.mock else _server_version(cfg.server.binary),
+        "Python": platform.python_version(),
+        "decision-bench": __version__,
+        "Backend": "mock" if args.mock else args.base_url or spawn,
+    }
+
     backend = "mock" if args.mock else args.base_url or "llama-server"
     print(f"suite={args.suite} cases={len(cases)} models={[m.name for m in models]} backend={backend}")
     runs = []
@@ -70,7 +95,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"running {model.name} ...", flush=True)
         runs.append(run_model(cfg, model, args.suite, cases, run_dir, base_url=args.base_url, mock=args.mock))
 
-    summary_path = write_summary_md(runs, args.suite, len(cases), cfg.error_budget, run_dir)
+    summary_path = write_summary_md(runs, args.suite, len(cases), cfg.error_budget, run_dir, meta)
     print(print_table(runs))
     print(f"\nreports: {summary_path}")
     ok_runs = [r for r in runs if not r.error]

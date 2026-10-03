@@ -55,3 +55,25 @@ Reading: julia-1 wins accuracy and latency but is badly calibrated on this slice
 lev is the best all-rounder (accuracy x KL); laya is the best-calibrated; kev-4b wins on clear-cut
 fixtures and selective automation (cov@5%) but sits under the dataset prior on accuracy. Full
 distributions per model in results/<ts>/<model>__<suite>.json.
+
+## Final full run — post-reconciliation clean rerun (2026-10-03 09:28-09:45 UTC, exit 0)
+
+After merging the parallel session's work: identity check via `GET /props` `model_path`,
+2 s settle after load (excluded from latency), `--ubatch-size 8192` on encoders,
+`-ngl 99` on 4B models. **0 failures over 10 000 decisions** (2 000 x 5 models).
+
+Fixture (20 cases): kev-4b 0.727 > lev 0.682 > laya 0.530 > kev-0.8b 0.500 > julia-1 0.379;
+kev-4b noul 0.950; julia-1 noul 0.500.
+
+typed-decisions FULL (400 cases, 2 000 decisions/model):
+
+| model | acc | Brier | NLL | ECE10 | KL | cov@5% | p50 s | mean case | load s |
+|---|---|---|---|---|---|---|---|---|---|
+| julia-1 | **0.725** | 0.381 | 3.441 | 0.227 | 2.810 | 0.001 | **0.053** | 55 ms | 1.2 |
+| kev-4b | 0.630 | **0.195** | **0.966** | 0.153 | **0.335** | **0.069** | 0.863 | 850 ms | 4.7 |
+| lev | 0.588 | 0.218 | 1.013 | **0.087** | 0.382 | 0.042 | 1.100 | 1 136 ms | 4.2 |
+| kev-0.8b | 0.429 | 0.277 | 1.106 | 0.152 | 0.475 | 0.019 | 0.603 | 582 ms | 2.2 |
+| laya | 0.340 | 0.399 | 1.324 | 0.112 | 0.693 | 0.000 | 0.152 | 141 ms | 0.7 |
+
+Refs: prior 0.470, teacher ceiling 0.735. Full tables + reading in
+docs/System-One-Decision-Models-Bench-Report-2026-10-03.md; raw summaries in docs/runs/.
