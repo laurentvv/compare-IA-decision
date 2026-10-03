@@ -1,3 +1,15 @@
 # OS
 Thumbs.db
 .DS_Store
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+dist/
+*.egg-info/
+
+# Bench run outputs (evidence numbers are quoted into progress.md)
+results/

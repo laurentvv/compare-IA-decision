@@ -1,3 +1,32 @@
 {
-  "features": []
+  "features": [
+    {
+      "id": "F-01",
+      "name": "Identify decision models and pin upstream docs",
+      "description": "Map user names to the 5 System One decision models via llama.cpp PR #29818 (laya, julia-1, lev, openjev, kev); pin /v1/systemone API doc, model cards, typed-decisions card, jev-benchmarks protocol in scratch/upstream_docs/.",
+      "status": "completed",
+      "dependencies": []
+    },
+    {
+      "id": "F-02",
+      "name": "Download GGUF models at matched quantization",
+      "description": "Q8_0 for all models (user comparability rule) into D:/Modeles_LLM/Decision/<Family>/: Laya, Julia-1, lev, Kev-4B, Kev-0.8B (smoke), OpenJev optional/disabled.",
+      "status": "in_progress",
+      "dependencies": ["F-01"]
+    },
+    {
+      "id": "F-03",
+      "name": "Implement comparison bench",
+      "description": "uv package decision_bench: /v1/systemone client, llama-server manager + mock backend, fixture suite + LocalLLaMA/typed-decisions adapter, jev-style metrics (accuracy/F1/Brier/NLL/ECE/KL/coverage/latency), JSON+Markdown report.",
+      "status": "pending",
+      "dependencies": ["F-01"]
+    },
+    {
+      "id": "F-04",
+      "name": "Validate bench pipeline",
+      "description": "ruff + pytest green; E2E mock runs; real E2E on local llama-server b11370 for enabled models (fixture + 25-case typed-decisions slice).",
+      "status": "pending",
+      "dependencies": ["F-03", "F-02"]
+    }
+  ]
 }

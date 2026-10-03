@@ -1,0 +1,38 @@
+[project]
+name = "decision-bench"
+version = "0.1.0"
+description = "Comparison bench for System One decision models served by llama.cpp POST /v1/systemone"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27",
+    "pandas>=2.2",
+    "pyarrow>=17",
+    "huggingface_hub>=0.34",
+]
+
+[project.scripts]
+decision-bench = "decision_bench.cli:main"
+decision-bench-mock = "decision_bench.mock_server:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/decision_bench"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
