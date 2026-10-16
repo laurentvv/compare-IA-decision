@@ -9,3 +9,4 @@
 ## [2026-10-03] done | F-02/F-03/F-04 complete: 26 tests green, mock E2E ok, real E2E both suites 0 failures (fixture 51 s, typed-25 94 s). Evidence in progress.md; features archived.
 ## [2026-10-03] eval | Clean full rerun after session merge (identity /props + settle 2 s): fixture 20 cases + typed-400 x 5 models, 0 fails. julia-1 0.725 acc @53 ms but cov@5%=0.001; kev-4b 0.630 best calibrated.
 ## [2026-10-03] done | Full-400 numbers in docs/System-One-Decision-Models-Bench-Report-2026-10-03.md; raw summaries in docs/runs/; results/20261003_112846 & _112938.
+## [2026-10-04] eval | Q&A: OneJev-4B not covered by this bench (text-only typed-decisions; openjev disabled; no OneJev GGUF on disk). Vision use case = ocr-to-validation repo.
