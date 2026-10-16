@@ -13,3 +13,4 @@ dist/
 
 # Bench run outputs (evidence numbers are quoted into progress.md)
 results/
+.agent/*.duckdb.wal
